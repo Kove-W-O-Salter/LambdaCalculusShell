@@ -8,6 +8,10 @@
 
 * Improve variable naming.
 
-## 2.0.0.1  -- 2018-7-6
+## 2.0.0.1  -- 2018-7-7
 
 * Add λ symbol.
+
+## 2.0.0.2  -- 2018-7-7
+
+* Take full advantage of `Yamp`.

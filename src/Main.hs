@@ -84,7 +84,7 @@ module Main where
     -- Match a variable name.
     --
     var :: Parser String
-    var  = do x <- satisfy (\c -> c/='λ' && isLower c)
+    var  = do x <- careful lower ['λ']
               xs <- many (letter <|> digit)
               return (x:xs)
 
