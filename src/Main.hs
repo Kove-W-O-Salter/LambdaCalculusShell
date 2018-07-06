@@ -91,7 +91,7 @@ module Main where
     -- Parse an abstraction.
     --
     abst :: Parser Expr
-    abst  = do matchChar '\\'
+    abst  = do matchChar '\\' <|> matchChar 'λ'
                spaces
                v <- var
                spaces
