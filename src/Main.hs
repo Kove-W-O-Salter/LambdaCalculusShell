@@ -10,6 +10,7 @@ module Main where
     --
     import Data.Yamp
     import Text.Yamp
+    import Data.Char
     import Control.Applicative
 
     --
@@ -83,7 +84,7 @@ module Main where
     -- Match a variable name.
     --
     var :: Parser String
-    var  = do x <- lower
+    var  = do x <- satisfy (\c -> c/='λ' && isLower c)
               xs <- many (letter <|> digit)
               return (x:xs)
 
@@ -91,7 +92,7 @@ module Main where
     -- Parse an abstraction.
     --
     abst :: Parser Expr
-    abst  = do matchChar '\\' <|> matchChar 'λ'
+    abst  = do matchChar 'λ' <|> matchChar '\\'
                spaces
                v <- var
                spaces
