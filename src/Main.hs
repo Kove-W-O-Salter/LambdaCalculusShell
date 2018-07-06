@@ -23,18 +23,28 @@ module Main where
     import System.IO
 
     --
-    -- The REPL.
+    -- For Haskeline.
+    --
+    import System.Console.Haskeline
+
+    --
+    -- The EntryPoint.
     --
     main :: IO ()
-    main  = do putStr "λ>>> "
-               hFlush stdout
-               l <- getLine
-               case l of
-                  ":quit" -> return ()
-                  _       ->
-                      do let r = parseRun l
-                         putStrLn (" =>>> " ++ r)
-                         main
+    main  = do runInputT defaultSettings repl
+
+    --
+    -- The REPL.
+    --
+    repl :: InputT IO ()
+    repl  = do ml <- getInputLine "λ>>> "
+               case ml of
+                    Nothing      -> return ()
+                    Just    ":q" -> return ()
+                    Just    l    ->
+                        do let r = parseRun l
+                           outputStrLn $ " =>>> " ++ r
+                           repl
 
     --
     -- Parse and run λ-calculus.
