@@ -1,6 +1,6 @@
 # LambdaCalculusShell
-A simple ADT to respresent
-the abscense of value.
+A simple shell, implementing,
+the `LambdaCalculus` library.
 
 ## Installation
 To install
