@@ -18,21 +18,21 @@ module Main where
     import LambdaCalculus
 
     --
-    -- For readLine.
+    -- For hFlush.
     --
-    import System.Console.Readline
+    import System.IO
 
     --
     -- The REPL.
     --
     main :: IO ()
-    main  = do ml <- readline "λ>>> "
-               case ml of
-                  Nothing      -> return ()
-                  Just ":quit" -> return ()
-                  Just l       ->
-                      do addHistory l
-                         let r = parseRun l
+    main  = do putStr "λ>>> "
+               hFlush stdout
+               l <- getLine
+               case l of
+                  ":quit" -> return ()
+                  _       ->
+                      do let r = parseRun l
                          putStrLn (" =>>> " ++ r)
                          main
 
@@ -81,7 +81,7 @@ module Main where
     -- Parse an abstraction.
     --
     abst :: Parser Expr
-    abst  = do matchChar '$'
+    abst  = do matchChar '\\'
                spaces
                v <- var
                spaces
@@ -97,7 +97,7 @@ module Main where
     appl  = do matchChar '{'
                spaces
                e1 <- expr
-               spaces
+               spaces1
                e2 <- expr
                spaces
                matchChar '}'
