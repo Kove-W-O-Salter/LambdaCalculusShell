@@ -5,53 +5,79 @@
  -}
 
 module Main where
+    --
+    -- For Yamp.
+    --
+    import Data.Yamp
+    import Text.Yamp
+    import Control.Applicative
 
-  import LambdaCalculus
-  import System.Console.Readline
-  import Text.ParserCombinators.Parsec
+    --
+    -- For LambdaCalculus.
+    --
+    import LambdaCalculus
 
-  main :: IO ()
-  main  = do l <- readline "Lcs Repl> "
-             case l of
-              Nothing      -> main
-              Just ":quit" -> return ()
-              Just s       -> do addHistory s
-                                 let r = parseRun s
-                                 putStrLn r
-                                 main
+    --
+    -- For readLine.
+    --
+    import System.Console.Readline
 
-  parseRun     :: String -> String
-  parseRun src  = case parse expr "Lcs" src of
-    Left  er -> show er
-    Right ex -> show $ run ex
+    --
+    -- The REPL.
+    --
+    main :: IO ()
+    main  = do ml <- readline "λ>>> "
+               case ml of
+                  Nothing      -> return ()
+                  Just ":quit" -> return ()
+                  Just l       ->
+                      do addHistory l
+                         let r = parseRun l
+                         putStrLn (" =>>> " ++ r)
+                         main
 
-  expr :: Parser Expr
-  expr  = try var <|> try abst <|> try app <|> try pexpr <?> "Expression"
+    parseRun   :: String -> String
+    parseRun s  = case parsePedantic expr s of
+        []  -> "[Syntax Error]"
+        [e] ->
+            case run e of
+                []  -> "[Semantics Error]"
+                [r] -> show r
 
-  var :: Parser Expr
-  var  = do l <- varName
-            return $ Var l
+    expr :: Parser Expr
+    expr  =  pxpr
+         <|> vari
+         <|> abst
+         <|> appl
 
-  abst :: Parser Expr
-  abst  = do char '\\'
-             spaces
-             v <- varName
-             spaces
-             char '.'
-             spaces
-             e <- expr
-             return $ Abs v e
+    pxpr :: Parser Expr
+    pxpr  = sandwhich (matchChar '(') (matchChar ')') expr
 
-  app :: Parser Expr
-  app  = do e1 <- expr
-            spaces
-            e2 <- expr
-            return $ App e1 e2
+    vari :: Parser Expr
+    vari  = do v <- var
+               return $ Var v
 
-  pexpr :: Parser Expr
-  pexpr  = between (char '(') (char ')') expr
+    var :: Parser String
+    var  = do x <- lower
+              xs <- many (letter <|> digit)
+              return (x:xs)
 
-  varName :: Parser String
-  varName  = do x <- lower
-                xs <- many (letter <|> digit)
-                return $ x : xs
+    abst :: Parser Expr
+    abst  = do matchChar '$'
+               spaces
+               v <- var
+               spaces
+               matchChar '.'
+               spaces
+               e <- expr
+               return $ Abs v e
+
+    appl :: Parser Expr
+    appl  = do matchChar '{'
+               spaces
+               e1 <- expr
+               spaces
+               e2 <- expr
+               spaces
+               matchChar '}'
+               return $ App e1 e2

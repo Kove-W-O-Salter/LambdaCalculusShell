@@ -60,7 +60,7 @@ executable LambdaCalculusShell
   default-extensions:    GADTs, KindSignatures
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.9 && <4.10, LambdaCalculus == 1.0.0.0, readline, parsec
+  build-depends:       base >=4.9 && <4.10, LambdaCalculus, readline, Yamp
   
   -- Directories containing source files.
   hs-source-dirs:      src
