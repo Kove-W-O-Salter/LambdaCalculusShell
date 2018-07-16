@@ -56,7 +56,29 @@ module Main where
         [e] ->
             case run e of
                 []  -> "[Semantics Error]"
-                [r] -> show r
+                [r] -> pretty r
+
+    --
+    -- Pretty print an expression.
+    --
+    pretty :: Expr -> String
+    pretty (Var x)    = clean x
+    pretty (Abs x y)  = "λ" ++ clean x ++ " . " ++ pretty y
+    pretty (App x y)  = "{" ++ prettyp x ++ " " ++ prettyp y ++ "}"
+    
+    --
+    -- Remove all safety symbols from an identifier.
+    --
+    clean :: Var -> Var
+    clean  = filter isLetter
+
+    --
+    -- A helper for pretty.
+    --
+    prettyp :: Expr -> String
+    prettyp (Var x)    = pretty (Var x)
+    prettyp (Abs x y)  = "(" ++ pretty (Abs x y) ++ ")"
+    prettyp (App x y)  = pretty (App x y)
 
     --
     -- Parse an expression.
